@@ -1,0 +1,40 @@
+1.Event(事件)
+	大多数Nodejs核心API都采用惯用的异步事件驱动架构，其中某些类型的对象（触发器会周期性地触发命名事件来调用函数对象（监听器）。
+
+	所有能触发事件的对象都是EventEmitter类的实例。这些对象开放了一个eventEmitter.on()函数，允许将一个或多个函数绑定到会被对象触发的命名事件上。
+
+	当EventEmitter对象触发一个事件时，所有绑定在该事件上的函数都被同步地调用。监听器的返回值会被丢弃。
+
+	例子：一个绑定了一个监听器的EventEmitter实例。eventEmitter.on()方法用于注册监听器,eventEmitter.emit()方法用于触发事件
+	const EventEmitter = require('events');
+
+	class MyEmitter extends EventEmitter {}
+	const myEmitter = new MyEmitter();
+	myEmitter.on('event', () => {
+		console.log('触发了一个事件！');
+	})
+	myEmitter.emit('event');
+
+	1.1 给监听器传入参数与this
+		eventEmitter.emit()方法允许将任意参数传给监听器函数。当一个普通的监听器函数被EventEmitter调用时，标准的this关键字会被设置指向监听器所附加的EventEmitter
+
+		const myEmitter = new MyEmitter();
+		myEmitter.on('event', function(a,b) {
+			console.log(a,b,this);
+			//打印
+			//a b MyEmitter {
+			// domain: null,
+			// _events: {event: [Function]},
+			// _eventsCount: 1,
+			// _maxListeners: undefined
+			}
+		});
+		myEmitter.emit('event', 'a', 'b');
+
+		也可以使用ES6的箭头函数作为监听器。但是这样this关键字就不再指向EventEmitter实例。
+		const myEmitter = new MyEmitter();
+		myEmitter.on('event', (a,b) => {
+			console.log(a,b,this);
+			//打印：a b {}
+		});
+		myEmitter.emit('event', 'a', 'b');
