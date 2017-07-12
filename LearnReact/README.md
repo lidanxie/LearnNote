@@ -1,0 +1,10 @@
+Reactjs学习计划
+	本周看完React官方文档（高级指南部分）：http://www.css88.com/react/docs/thinking-in-react.html
+	周末需要了解
+		React-Router:https://react-guide.github.io/react-router-cn/
+		redux:http://cn.redux.js.org/docs/introduction/index.html
+		https://fakefish.github.io/react-webpack-cookbook/index.html
+	下周逐步构建个人博客的前端项目
+	社区：http://react-china.org/
+	http://www.cnblogs.com/vajoy/p/4591274.html
+	切记不要放弃！不要心急！不要浮躁！该学习的时候学习，该打码的时候打码！先做一个努力认真
