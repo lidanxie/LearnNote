@@ -1,4 +1,4 @@
-1.Event(事件)
+1.Event(事件) 
 	大多数Nodejs核心API都采用惯用的异步事件驱动架构，其中某些类型的对象（触发器会周期性地触发命名事件来调用函数对象（监听器）。
 
 	所有能触发事件的对象都是EventEmitter类的实例。这些对象开放了一个eventEmitter.on()函数，允许将一个或多个函数绑定到会被对象触发的命名事件上。
@@ -38,3 +38,193 @@
 			//打印：a b {}
 		});
 		myEmitter.emit('event', 'a', 'b');
+
+	1.2 异步与同步
+			EventListener会按照监听器注册的顺序同步地调用所有监听器。所以需要确保事件的正确排序且避免竞争条件或逻辑错误。监听器函数可以使用setImmediate()或process.nextTick()方法切换到异步操作模式。
+
+			const myEmitter = new MyEmitter();
+			myEmitter.on('event', (a, b) => {
+				setImmediate(() => {
+					console.log('这个是异步发生的');
+				});
+			});
+			myEmitter.emit('event', 'a', 'b');
+
+	1.3 只处理事件一次
+			当使用eventEmitter.on()方法注册监听器时，监听器会在每次触发命名事件时被调用。
+
+			const myEmitter = new MyEmitter();
+			let m = 0;
+			myEmitter.on('event', () => {
+				console.log(++m);
+			})
+			myEmitter.emit('event');  //打印1
+			myEmitter.emit('event');  //打印2
+
+			使用eventEmitter.once()方法时可以注册一个对于特定事件最多被调用一次的监听器。当事件被触发是，监听器会被注销，然后再调用
+
+			const myEmitter = new MyEmitter();
+			let m = 0;
+			myEmitter.once('event', () => {
+				console.log(++m);
+			});
+			myEmitter.emit('event');  //打印1
+			myEmitter.emit('event');   //忽略
+
+	1.4 错误事件
+			当EventEmitter实例中发生错误时，会触发一个'error'事件。
+			如果EventEmitter没有为'error'事件注册至少一个监听器，则当'error'事件触发时，会抛出错误、打印堆栈跟踪、且退出nodejs进程
+
+			const myEmitter = new MyEmitter();
+			myEmitter.emit('error', new Error('whoops!'));    //抛出错误，并使nodejs崩溃
+
+			为了防止Nodejs进程崩溃，可以在process对象的uncaughtException事件上注册监听器，或者使用domain模块。
+
+			const myEmitter = new MyEmitter();
+			process.on('uncaughtException', (err) => {
+				console.log('有错误');
+			});
+
+			最佳实战：始终未error事件注册监听器
+			const myEmitter = new MyEmitter();
+			myEmitter.on('error', (err) => {
+				console.error('有错误');
+			})
+			myEmitter.emit('error', new Error('whoops!'));
+
+	1.5 EventEmitter类
+		const EventEmitter = require('events');
+
+		当新的监听器被添加时，所有的EventEmitter会触发'newListener'事件；当移除已存在的监听器时，则触发'removeListener'
+
+	1.6 newListener事件
+
+		EventEmitter实例会在一个监听器被添加到其内部监听器数组之前触发自身的'newListener'事件
+
+		注册了'newListener'事件的监听器会传入事件名语被添加的监听器的引用。
+
+		const myEmitter = new MyEmitter();
+		//只处理一次，所以不会无限循环
+		myEmitter.once('newListener', (event, listener) => {
+			if(event === 'event') {
+				//在开头插入一个新的监听器
+				myEmitter.on('event', () => {
+					console.log('B');
+				});
+			}
+		});
+		myEmitter.on('event', () => {
+			console.log('A');
+		})
+		myEmitter.emit('event');  
+		//打印 B A
+
+	1.7 removeListener事件
+		removeListener事件在listener后会被移除
+
+	1.8 EventEmitter.defaultMaxListeners
+		每个事件默认可以注册最多10个监听器。单个EventEmitter实例的限制可以使用emitter.setMaxListeners(n)方法改变。所有EventEmitter实例的默认值可以使用EventEmitter.defaultMaxListener属性改变。如果不是正数，将会抛出TypeError
+
+		调用emitter.setMaxListener优先于EventEmitter.defaultMaxListeners
+
+		emitter.setMaxListeners(emitter.getMaxListeners() + 1);
+		emitter.once('event', () => {
+			emitter.setMaxListeners(Math.max(emitter.getMaxListeners() - 1, 0));
+		})
+
+	1.9 emitter.addListener(eventaName,listener);
+		emitter.on()的别名
+
+	1.10 emitter.emit(eventName)
+		按监听器的注册顺序，同步地调用每个注册到名为eventName事件的监听器，并传入提供的参数。
+		如果事件有监听器，则返回true,否则返回false
+
+	1.11 emitter.eventNames() 
+		返回一个列出触发器已注册监听器的事件的数组。数组中的值为字符串或符号。
+
+		const EventEmitter = require('events');
+		const myEE = new EventEmitter();
+		myEE.on('foo', () => {});
+		myEE.on('bar', () => {});
+
+		const sym = Symbol('symbol');
+		myEE.on(sym, () => {});
+
+		console.log(myEE.eventNames);   //['foo','bar',Symbol(symbol)]
+
+	1.12 emitter.listeners(eventName)
+		返回eventName的事件的监听器数组的副本
+		server.on('connection', (stream) => {
+			console.log('someone connected!');
+		});
+		console.log(util.inspect(server.listeners('connection')));
+
+	1.13 emitter.prependListener(eventName,listener)
+		添加listener函数到名为eventName的事件的监听器数组的开头。不会检查listener是否被添加。多次调用并传入相同的eventName和listener会导致listener被添加与调用多次
+		server.prependListener('connection', (stream) => {
+			console.log('有连接！');
+		})
+
+	1.14 emitter.removeListener(eventName,listener)
+		从名为eventName的事件监听器数组中移除指定的listener
+
+		const callback = (stream) => {
+			console.log('有连接！');
+		}
+		server.on('connection', calback);
+		server.removeListener('connection', callback);
+
+		removeListener最多只会从监听器数组里移除一个监听器实例。如果任何单元的监听器被多次添加指定eventName的监听器数组中，则必须多次调用removeListener才能移除每个实例。
+
+		注意，一旦一个事件被触发，所有绑定到它的监听器都会按顺序依次触发。这意味着，在事件触发后、最后一个监听器完成执行前，任何removeListener()或removeAllListener()调用都不会从emit()中移除它们。随后的事件会想预期那样发生。
+
+		const myEmitter = new MyEmitter();
+		const callbackA = () => {
+			console.log('A');
+			myEmitter.removeListener('event', callbackB);
+		};
+		const callbackB = () => {
+			console.log('B');
+		};
+		myEmitter.on('event', callbackA);   
+		myEmitter.on('event', callbackB);   
+		//callbackA移除了监听器callbackB,但它仍然会被调用。
+		//触发是内部的监听器数组为：[callbackA,callbackB]
+		myEmitter.emit('event'); //A B
+		myEmitter.emit('event');  //A
+
+	博客总结：
+		观察者模式：就是为某一对象添加一监听事件，由该事件在符合条件时自行触发。
+	参考博客链接：https://cnodejs.org/topic/561b869eba66abef398b007d
+
+2. Error(错误)
+	Nodejs中运行的应用程序一般会遇到以下四类错误：
+		标准javascript错误:
+			EvalError:当调用eval()失败时抛出
+			SyntaxError:当javascript语法错误时抛出
+			RangeError:当值不在预期范围内抛出
+			ReferenceError:当使用未定义的变量时抛出
+			TypeError:当传入错误类型的参数时抛出。
+			URIError:当全局的URI处理函数被误用时抛出
+		由底层操作系统触发的系统错误；
+		由应用程序代码触发的用户自定义的错误；
+		断言错误是错误的一个特殊类别，每当Node.js检测到一个不应该发生的异常逻辑时触发。
+
+	2.1 错误的冒泡和捕获
+		Node.js支持几种当应用程序运行时发生的错误的冒泡和处理的机制。如何报告和处理这些错误完全取决于错误的类型和被调用的API的风格。
+
+		所有的Javascript错误都会被当做异常处理，异常会立即产生并使用标准的Javascript throw机制抛出一个错误。这些都是使用javascript语言提供的try/catch语言处理的
+		如：
+		try {
+			const m = 1;
+			const n = m + z;
+		} catch(err) {
+			//处理错误
+		}
+
+		javascript的throw机制的任何使用都会引起异常，异常必须使用try/catch处理，否则Nodejs进程会立即退出。
+
+		除了少数例外，同步的API(任何不接受callback函数的阻塞方法)会使用throw报告错误
+
+		异步的API中发生错误
+
