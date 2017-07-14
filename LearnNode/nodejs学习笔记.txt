@@ -198,6 +198,7 @@
 	参考博客链接：https://cnodejs.org/topic/561b869eba66abef398b007d
 
 2. Error(错误)
+	参考博客：https://segmentfault.com/a/1190000002741935
 	Nodejs中运行的应用程序一般会遇到以下四类错误：
 		标准javascript错误:
 			EvalError:当调用eval()失败时抛出
@@ -226,5 +227,18 @@
 
 		除了少数例外，同步的API(任何不接受callback函数的阻塞方法)会使用throw报告错误
 
-		异步的API中发生错误
+		异步的API中发生的错误可能会以多种方式进行报告：
+			大多数的异步方法都接受一个callback函数，该函数会接受一个Error对象传入作为第一个参数。如果第一个参数不是null而是Error实例，则说明发生了错误。
+				const fs = require('fs');
+				fs.readFile('一个不存在的文件', (err, data) => {
+					if(err) {
+						console.log('读取文件出错！', err);
+						return;
+					}
+					//否则处理数据
+				})
+			当一个异步方法被一个EventEmitter对象调用时，错误会被分发到对象的'error'事件上。
+				const net = require('net');
+				const connection = net.connect('localhost')
+
 
