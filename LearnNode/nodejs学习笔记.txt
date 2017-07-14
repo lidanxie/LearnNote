@@ -199,6 +199,7 @@
 
 2. Error(错误)
 	参考博客：https://segmentfault.com/a/1190000002741935
+	http://www.imooc.com/article/1650
 	Nodejs中运行的应用程序一般会遇到以下四类错误：
 		标准javascript错误:
 			EvalError:当调用eval()失败时抛出
