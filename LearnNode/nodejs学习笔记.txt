@@ -242,4 +242,141 @@
 				const net = require('net');
 				const connection = net.connect('localhost')
 
+3.HTTP
+	博客：https://cnodejs.org/topic/58eee565a92d341e48cfe7fc
 
+	要使用http服务器与客户端，需要require('http');
+	Nodejs中的http接口被设计成支持协议的许多特性。比如，大块编码的消息。这些接口不缓冲完整的请求或响应时间，用户能够以流的形式处理数据。
+	为了支持各种可能的http应用，nodejs的HTTP API是非常底层的。它只设计流处理与消息解析。它把一个消息解析成消息头和消息主体，但不解析具体的消息头或消息主体。
+
+	接收到的消息头保存在rawHeaders属性中，它是一个[key,value,key2,value2...]数组。
+
+	3.1http.Agent类
+		Agent负责为HTTP客户端管理连接的持续与复用。它为一个给定的主机与端口维护着一个等待请求的队列，且为每个请求重复使用一个单一的socket连接直到队列为空，此时socket会被销毁或被放入一个连接池中，在连接池中等待被有着相同主机与端口号的请求再次使用。是否被销毁或被放入连接池取决于keepAlive选项
+
+		连接池的连接的TCP Keep-Alive是开启的，但服务器仍然可能关闭闲置的连接，在这种情况下，这些连接会被移出连接池，且当一个新的HTTP请求被创建时再为指定的主机与端口号创建一个新的连接。服务器也可能拒绝允许同一个连接上有多个请求，在这种情况下，连接会为每个请求重新创建，且不能被放入连接池。Agent仍然会创建请求到服务器，但每个请求会出现在一个先的连接。、
+		但一个客户端或服务器关闭时，它会被移出连接池。连接池中任何未被使用的socket会被释放，从而使nodejs进程在没有请求时不用保存运行。
+
+		当Agent实例不再被使用时，建议destroy()它，因为未被使用的socket也会消耗操作系统资源。
+
+		当socket触发'close'事件或'agentRemove'事件时，它会被移出代理池。当打算长时间保持打开一个HTTP请求且不想它留着连接池中，可以做如下处理
+
+		http.get(options, (res) => {
+		//处理事情
+		}).on('socket', (socket) => {
+			socket.emit('agentRemove');
+		})
+
+		代理页可被用于单独请求，使用{agent:false}作为http.get()函数或者http.request()函数的选项，则会为客户端连接创建一个默认配置的一次性使用的Agent.
+
+		http.get({
+			hostname:'localhost',
+			port:80,
+			path:'/',
+			agent:false    //创建一个新的代理，只用于本次请求
+		}, (res) => {
+		//对响应进行处理
+		})
+
+	3.2 new Agent([options])
+		options代理的配置选项，有以下字段：
+			keepAlive<boolean>保持socket可用即使没有请求，以便它们可被将来的请求使用而无需重新建立一个TCP连接。默认为false
+			keepAliveMsecs<number>当使用了keepAlive选项时，该选项指定TCP Keep-Alive数据包的初始延迟。当keepAlive选项为false或undefined时，该选项无效。默认为1000
+			maxSocket<number>每个主机允许的最大socket数量。
+			maxFreeSockets<number>在空闲状态下允许打开的最大socket数量。仅当keepAlive为true时才有效
+
+			若要配置其中任何一个，则需要创建自定义的http.Agent实例
+			const http = require('http');
+			const keepAliveAgent = new http.Agent({keepAlive: true});
+			options.agent = keepAliveAgent;
+			http.request(options, onResponseCallback);
+
+	3.3 agent.createConnection(options[,callback])
+		options<object> 包含连接详情的选项。
+		返回<net.Socket>
+		创建一个用于HTTP请求的socket或流。
+		socket或流可以通过以下两种方式获取：从该函数返回，或传入callback.
+
+	3.4 agent.keepSocketAlive(socket)
+	3.5 agent.destroy()
+		销毁当前正被代理使用的任何socket.
+	3.6 agent.freeSockets
+		返回一个对象，包含当前正在等待被启用了keepAlive的代理使用的socket数组。不要修改该属性
+
+	3.7 agent.getName(options)
+		options<object>为名称生成程序提供信息的选项。
+
+		为请求选项的集合获取一个唯一的名称，用来判断一个连接是否可以被复用。对于HTTP代理，返回host:port:localAddress.对于HTTPS代理，
+
+	3.8 http.ClientRequest类
+		该对象在http.request()内部被创建并返回。它表示着一个正在处理的请求，其请求头已进入队列。请求头仍可使用setHeader(name.value)、getHeader(name)和removeHeader(name)API进行修改。实际的请求头会与第一个数据块一起发送或当关闭连接时发送。
+
+		要获取响应，需为'response'事件添加一个监听器到请求对象上。当响应头被接收到时，'response'事件会从请求对象上被触发。'response'事件被执行时带有一个参数，该参数是一个http.IncominMessage实例。
+		在'response'事件期间，可以添加监听器到响应对象上，比如监听'data'事件
+
+		如果没有添加'response'事件处理函数，则响应会被整个丢弃。如果添加了'response'事件处理函数，则必须消耗完响应对象的数据，可通过调用response.read()、或添加一个'data'事件处理函数、或调用.resume()方法。数据被消耗完时会触发'end'事件。在数据被读取完之前会消耗内存，可能会造成'process out of memory'错误。
+
+	3.9 abort 事件
+		当请求已被客户端终止时触发。
+	3.10 aborted事件
+		当请求被服务器终止且网络socket已关闭时触发。
+	3.11 connet事件
+		每当服务器响应connet 请求时触发。如果该事件未被监听，则接收到CONNECT方法的客户端会关闭连接。
+
+		const http = require('http');
+		const net = require('net');
+		const url = require('url');
+
+		//创建一个HTTP代理服务器
+		const proxy = http.createServer((req, res) => {
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end('okay');
+		});
+
+		proxy.on('connect', (req, cltSocket, head) => {
+			//连接一个服务器
+			const srvUrl = url.parse('http://${req.url}');
+			const srvSocket = net.connect(srvUrl.port, srvUrl.hostname, () => {
+				cltSocket.write('HTTP/1.1 200 Connection Established\r\n' + 'Proxy-agent: Node.js-proxy\r\n' + '\r\n');
+				srvSocket.write(head);
+				srvSocket.pipe(cltSocket);
+				cltSocket.pipe(srvSocket);
+			});
+		});
+
+		//代理服务器正在运行
+		proxy.listen(1337,'127.0.0.1', () => {
+			const options = {
+				port:1337,
+				hostname:'127.0.0.1',
+				method:'CONNECT',
+				path:'www.google.com:80'
+			};
+
+			const req = http.request(options);
+			req.end();
+
+			req.on('connect', (res,socket,head) => {
+				console.log('已连接！');
+
+				//通过代理服务器发送一个请求
+				socket.write('GET / HTTP/1.1\r\n' +
+							'Host: www.google.com:80\r\n' +
+							'Connection: close\r\n' + '\r\n');
+				socket.on('data', (chunk) => {
+					cosole.log(chunk.toString());
+				});
+				socket.on('end', () => {
+					proxy.close();
+				});
+			});
+		});
+
+4.Child Processes(子进程)
+	child_process模块提供了衍生子进程的功能，它与popen类似，但不完全相同。
+
+	默认情况下，在Nodejs的父进程与衍生的子进程之间会建立stdin、stdout和stderr的管道。数据能以飞阻塞的方式在管道中流通。注意，有些程序会在内部使用缓冲I/O.虽然这不影响NODEJS,但这意味着子进程的数据可能无法被立即使用
+
+	child_process.spawn()方法会异步地衍生子进程，且不会阻塞Node.js事件循环。
+	child_process.spawnSync()方法则以同步的方式提供同样的功能，但会阻塞事件循环，直到衍生的子进程退出或终止。
+	
