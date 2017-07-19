@@ -372,7 +372,7 @@
 			});
 		});
 
-4.Child Processes(子进程)
+4.Child Processes(子进程) :https://segmentfault.com/a/1190000007735211
 	child_process模块提供了衍生子进程的功能，它与popen类似，但不完全相同。
 
 	默认情况下，在Nodejs的父进程与衍生的子进程之间会建立stdin、stdout和stderr的管道。数据能以飞阻塞的方式在管道中流通。注意，有些程序会在内部使用缓冲I/O.虽然这不影响NODEJS,但这意味着子进程的数据可能无法被立即使用
@@ -388,3 +388,81 @@
 		在非windows平台上，如果将options.detached设为true，则子进程会成为新的进程组和会话的领导者。注意，子进程在父进程退出后可以继续运行，不管它们是否被分离。
 
 	4.3 options.stdio 选项用于配置子进程与父进程之间建立的管道。
+
+
+5. File System(文件系统)
+	文件I/O是由简单封装的标准POSIX函数提供。通过require('fs')使用该模块。所有的方法都有异步和同步的形式。
+
+	异步方法的最后一个参数都是回调函数。传给回调函数的参数取决于具体方法，但回调函数的第一个参数都会保留给异常。如果操作成功完成，则第一个参数会是null或undefined。
+
+	当使用同步方法时，任何异常都会被立即抛出。可以使用try/catch来处理异常，或让异常向上冒泡。
+
+	异步的方法不能保证执行顺序。所以下面的例子可能会出错：
+
+	const fs = require('fs');
+	fs.rename('/tmp/hello', '/tmp/world', (err) => {
+		if(err) throw err;
+		console.log('重命名完成');
+	});
+	fs.stat('/tmp/world', (err,stats) => {
+		if(err) throw err;
+		console.log('文件属性：${JSON.stringify(stats)}');
+	});
+	fs.stat可能在fs.rename之前执行。正确的方法是把回调链起来。
+
+	fs.rename('/tmp/hello', '/tmp/world', (err) => {
+		if(err) throw err;
+		fs.stat('/tmp/world', (err,stats) => {
+			if(err) throw err;
+			console.log('文件属性： ${JSON.stringify(stats)}');
+		})
+	});
+	在繁忙的进程中，建议使用异步的方法。同步的方法会阻塞整个进程，直到完成(停止所有连接)
+	大多数fs函数可以省略回调函数，在这种情况下，会使用默认的回调函数，若要追踪最初的调用点，可以设置NODE_DEBUG环境变量：
+	注意：不建议省略异步方法的回调函数，未来的版本可能会导致抛出错误。
+
+	5.1 WHATWG URL object support
+		对于大多数fs模块的函数，path或者filename参数可以当作一个WHATWG URL对象传入。只有URL对象使用被支持file协议。
+		const fs = require('fs');
+		const { URL } = require('url');
+		const fileUrl = new URL('FILE:///tmp/hello');
+
+		fs.readFileSync(fileUrl);
+		注意：file:URLS必须是绝对路径。
+
+	5.2 Buffer API
+		fs函数支持传递和接收字符串路径与Buffer路径。后者的目的是使其可以在允许非UTF-8文件名的文件系统中工作。对于大多数普通用途，使用Buffer路径是不必要的，因为	字符串API会自动与UTF-8互相转换。
+
+	5.3 fs.FSWatcher类
+		从fs.watch()返回的对象是该类型。
+		提供给fs.watch()的listener回调会接收返回的FSWatcher的change事件，该对象本身可触发以下事件：
+
+	    5.3.1 change事件
+	    	当一个被监视的目录或文件有变化时触发。
+	    	//例子, 处理fs.watch监听器
+	    	fs.watch('./tmp', {encoding: 'buffer'}, (eventType, filename) => {
+	    		if(filename)
+	    			console.log(filename);
+	    	})
+	5.4 fs.ReadStream类
+	5.5 fs.Stats类
+	5.6 fs.access
+		//例子：会检查/etc/passwd文件是否可以被当前进程读取和写入
+		fs.access('/etc/passwd', fs.constants.R_OK | fs.constants.W_OK, (err) => {
+			console.log(err ? 'no access!' : 'can read/write');
+		})
+		不建议在调用fs.open()、fs.readFile()或fs.writeFile()之前使用fs.access()检查一个文件的可访问性。如此处理会造成紊乱情况，因为其他进程可能在两个调用之间改变文件的状态。作为替代，用户代码应该直接打开/读取/写入文件，当文件无法访问时再处理错误。
+	5.7 fs.appendFile(file,data[,options],callback)
+		异步地追加数据到一个文件，如果文件不存在则创建文件。data可以是一个字符串或buffer
+		例子：
+		fs.appendFile('message.txt','data to append', (err) => {
+			if(err) throw err;
+			console.log('The "data to append" was appended to file!');
+		});
+
+6. Global(全局变量)
+	全局变量：这些对象在所有模块中都是可用的。有些对象实际上不在全局作用域内，而是在模块作用域内，这个在文档中会注明。
+
+		6.1 Buffer类：处理二进制数据
+		6.2 __dirname 当前模块的目录名。
+		6.3 __filename :当前模块的文件名。这是当前模块文件的解析后的绝对路径。
