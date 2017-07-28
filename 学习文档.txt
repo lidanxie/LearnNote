@@ -83,3 +83,6 @@ AMP:
 https://www.ampproject.org/zh_cn/
 WAP:
 https://codelabs.developers.google.com/codelabs/your-first-pwapp/#0
+
+LAVAS:
+https://lavas.baidu.com/doc

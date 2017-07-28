@@ -1,0 +1,83 @@
+//hello world
+var koa = require('koa')
+var app = koa();
+
+app.use(function *(){
+	this.body = 'hello World';
+});
+
+app.listen(3000);
+
+
+1. koa1.0使用generator实现异步
+如：
+	var koa = require('koa');
+	var app = koa();
+
+	app.use('/test', function* (){
+		yield doReadFile1();
+		var data = yield doReadFile2();
+		this.body = data;
+	});
+	app.listen(3000);
+
+2. koa2.0 
+	koa2.0基于ES7开发，koa2.0完全基于Promise并配合async来实现异步；
+	如：
+	app.use(async (ctx,next) => {
+		await next();
+		var data = await doReadFile();
+		ctx.response.type = 'text/plain';
+		ctx.response.body = data;
+	})
+
+	创建koa2工程
+	const Koa = require('koa');
+	//创建一个Koa对象表示web app本身
+	const app = new Koa();
+
+	//对于任何请求，app将调用异步函数处理请求
+	app.use(async (ctx, next) => {
+		await.next();
+		ctx.response.type='text/html';
+		ctx.response.body = '<h1>Hello,koa2!</h1>'
+	})
+	//在端口3000监听
+	app.listen(3000);
+	console.log('app started at port 3000');
+
+	参数ctx是由koa传入的封装了request和response的变量，我们通过它可以访问到request和response，next是koa传入的将要处理的下一个异步函数。
+
+	我们首先使用await next()处理下一个异步函数。
+
+	const Koa = require('koa');
+
+	// 创建一个Koa对象表示web app本身:
+	const app = new Koa();
+
+	app.use(async (ctx, next) => {
+		if(ctx.request.path === '/') {
+			ctx.response.body = 'index.page';
+		} else {
+			await next();
+		}
+	});
+
+	app.use(async (ctx, next) => {
+		if(ctx.request.path === '/test') {
+			ctx.response.body = 'TEST.page';
+		} else {
+			await next();
+		}
+	})
+
+	app.use(async (ctx, next) => {
+		if(ctx.request.path === 'error'){
+			ctx.response.body = 'ERROR.page';
+		}else {
+			await next();
+		}
+	})
+
+	Koa-router
+	
