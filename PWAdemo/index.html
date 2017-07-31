@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no"/>
+	<title>PWAdemo</title>
+	<link rel="stylesheet" type="text/css" href="main.css">
+	<link rel="manifest" href="manifest.json">
+	<link rel="icon" type="image/png" href="/e.png">
+</head>
+<body>
+	<div class="revision">Revision 8</div>
+	<img src="pwa-fonts.png">
+	<div class="main-text">
+		Minimal PWA, open Console for more!
+	</div>
+	<div class="network-message">
+		Network:
+	<span id="network-status" class="">Good</span>
+	</div>
+
+  	<script>
+  		/**
+	* 添加service Worker，service Worker在网页已经关闭的情况下还可以运行，用来实现页面的缓存和离线，后台通知等
+	*/
+	if(navigator.serviceWork != null){
+		navigator.serviceWork.register('sw.js')
+		.then((registration) => {
+			console.log("registered events at scope", registration.scope);
+		});
+	}
+
+	fetch('./data.json')
+	var statusE1 = document.querySelector("#network-status")
+	if(!navigator.online) {
+		statusE1.classList = ['is-offline']
+		statusE1.innerText = 'offline'
+	}
+  	</script>
+  	<script type="text/javascript" src="sw.js"></script>
+</body>
+</html>
