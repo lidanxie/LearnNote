@@ -221,3 +221,74 @@ CORS与JSONP的使用目的相同，但是比JSONP更强大。
 JSONP只支持GET请求，CORS支持所有类型的HTTP请求。JSONP的优势在于支持老式浏览器，以及可以向不支持CORS的网站请求数据。
 
 
+# HTTP同源策略
+**同源策略**是web安全策略中的一种，非常重要。
+同源策略明确规定：**不同域的客户端在没有明确授权的情况下，不能读写对方的资源。** 
+简单说来就是web浏览器允许第一个页面的脚本访问访问第二个页面的数据，但是也只有在两个页面有相同的源的时候，如果不同源则需要授权。源：**URI(统一资源标识符)、主机名、端口号**组合而成的。这个策略可以阻止一个页面上恶意脚本通过页面DOM对象获得访问另一个页面的敏感信息的权限。
+
+### 历史
+同源策略的概念要追溯到1995年的网景浏览器。同源策略作为一个重要的安全基石，所有的现代浏览器都在一定程度上实现了同源策略。同源策略虽然不是一个明确规范，但是经常为某些web技术（例如Microsoft Silverlight,Adobe Flash,Adobe Acrobat）或者某些机制（例如XMLHttpRequest）扩展定义大致兼容的安全边界。
+
+
+### 源决定规则
+RFC6454中有定义URI源的算法定义。对于绝对的URIs，源就是{**协议，域名，端口**}定义的。只有这些值完全一样才认为两个资源是同源的。如http://www.example.com：80/dir/page.html 
+
+> http://  协议
+> www.example.com  域名
+> ：80 端口号
+
+举个栗子：比较表格中的URL与"http://www.example.com/dir/page.html"是否同域。
+
+| 对比URL | 结果 | 结果分析 |
+| ------------- |:-------------:| :-----:|
+| http://www.example.com/dir/page2.html | 同源 | 相同的协议、域名、端口号 |
+| http://www.example.com/dir2/other.html | 同源 | 相同的协议、域名、端口号 |
+| http://username:password@www.example.com/dir2/other.html | 同源 | 相同的协议、域名、端口号 |
+| http://www.example.com:81/dir/other.html | 不同源 | 相同的协议、域名；不同的端口号 |
+| https://www.example.com/dir/other.html | 不同源 | 相同的域名、端口号；不同的协议 |
+| http://en.example.com/dir/other.html | 不同源 | 相同的协议、端口号；不同的域名|
+| http://example.com/dir/other.html | 不同源 | 不同的域名（需要精确匹配） |
+| http://v2.www.example.com/dir/other.html | 不同源 | 不同的域名（需要精确匹配） |
+| http://www.example.com:80/dir/other.html | 看情况 | 端口明确，需要依赖于浏览器的实现 |
+
+不像其他浏览器，IE在计算源的时候没有包括端口。
+
+#### 限制的范围
+随着互联网的发展，"同源政策"越来越严格。目前，如果非同源，共有三种行为受到限制。
+
+ 1. Cookie、LocalStorage 和 IndexDB 无法读取。
+ 2. DOM 无法获得。
+ 3. AJAX 请求不能发送。
+ 
+ 虽然这些限制是必要的，但是有时很不方便，合理的用途也受到影响。
+#### **授权**
+默认情况下访问一个站点是不允许跨越的，只有目标站点（比如：http://www.example.com/dir/page.html）明确返回HTTP响应头Access-Control-Allow-Origin: http://www.evil.com 那么www.evil.com站点上的客户端脚本就有权通过AJAX技术对www.foo.com上的数据进行读写操作。
+
+#### 读写权限
+Web上的资源有很多，有的只有读权限，有的同时拥有读和写的权限。比如：HTTP请求头里的Referer（表示请求来源）只可读，而document.cookie则具备读写权限。这样的区分也是为了安全上的考虑。
+
+### 安全的考量
+有这种限制的主要原因是因为如果没有同源策略将导致安全风险。假设用户在访问银行网站，并且没有登出。然后他又去了任意的其他网站，刚好这个网站有恶意的js代码，在后台请求银行网站的信息。因为用户目前仍然是银行站点的登陆状态，那么恶意代码就可以在银行站点做任意事情。例如，获取你的最近交易记录，创建一个新的交易等等。因为浏览器可以发送接收银行站点的session cookies，在银行站点域上。访问恶意站点的用户希望他访问的站点没有权限访问银行站点的cookie。当然确实是这样的，js不能直接获取银行站点的session cookie，但是他仍然可以向银行站点发送接收附带银行站点session cookie的请求，本质上就像一个正常用户访问银行站点一样。关于发送的新交易，甚至银行站点的CSRF（跨站请求伪造）防护都无能无力，因为脚本可以轻易的实现正常用户一样的行为。所以如果你需要session或者需要登陆时，所有网站都面临这个问题。如果上例中的银行站点只提供公开数据，你就不能触发任意东西，这样的就不会有危险了，这些就是同源策略防护的。当然，如果两个站点是同一个组织的或者彼此互相信任，那么就没有这种危险了。
+
+
+### 规避同源策略
+在某些情况下同源策略太严格了，给拥有多个子域的大型网站带来问题。下面简要介绍解决这种问题的技术：
+
+#### **document.domain属性**
+如果两个window或者frames包含的脚本可以把domain设置成一样的值，那么就可以规避同源策略，每个window之间可以互相沟通。例如，`orders.example.com`下页面的脚本和`catalog.example.com`下页面的脚本可以设置他们的`document.domain`属性为`example.com`，从而让这两个站点下面的文档看起来像在同源下，然后就可以让每个文档读取另一个文档的属性。
+
+#### **跨域资源共享**
+这种方式即上文所说的授权，使用了一个新的`Origin`请求头和一个新的`Access-Control-Allow-Origin`响应头扩展了HTTP。允许服务端设置`Access-Control-Allow-Origin`头标识哪些站点可以请求文件，或者设置`Access-Control-Allow-Origin`头为"*"，允许任意站点访问文件。
+
+#### **跨文档通信**
+这种方式允许一个页面的脚本发送文本信息到另一个页面的脚本中，不管脚本是否跨域。在一个window对象上调用postMessage()会异步的触发window上的onmessage事件，然后触发定义好的事件处理方法。一个页面上的脚本仍然不能直接访问另外一个页面上的方法或者变量，但是他们可以安全的通过消息传递技术交流。
+
+#### **JSONP**
+JOSNP允许页面接受另一个域的JSON数据，通过在页面增加一个可以从其它域加载带有回调的JSON响应的`<script>`标签。
+
+#### **WebSocket**
+现代浏览器允许脚本直连一个WebSocket地址而不管同源策略。然而，使用WebSocket URI的时候，在请求中插入Origin头就可以标识脚本请求的源。为了确保跨站安全，
+
+
+
+
