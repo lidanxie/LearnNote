@@ -176,10 +176,10 @@ Access-Control-Allow-Credentials: true
 Access-Control-Max-Age: 1728000
 ```
 
-**（1）Access-Control-Allow-Methods **
+**（1）Access-Control-Allow-Methods**
 该字段是必须的，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。注意：返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次预检请求。
 
-**（2）Access-Control-Allow-Headers **
+**（2）Access-Control-Allow-Headers**
 如果浏览器请求包含`Access-Control-Allow-Headers`，则`Access-Control-Allow-Headers` 字段是必须的。它也是一个逗号分隔的字符串，表明服务器支持的**所有**头信息的字段，不限于浏览器在"预检"中请求的字段。
 
 **（3）Access-Control-Allow-Credentials**
