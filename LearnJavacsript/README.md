@@ -1,5 +1,7 @@
-跨域资源共享CORS详解
+JavaScript学习笔记
 =======
+
+# 1.跨域资源共享CORS详解
 
 最近深入了解了CORS的相关东西，觉得阮一峰老师的文章写得最详细易懂了，所有转载作为学习笔记。
 原文地址：[跨域资源共享 CORS 详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)
@@ -217,3 +219,5 @@ Content-Type: text/html; charset=utf-8
 ## 五、与JSONP的比较
 CORS与JSONP的使用目的相同，但是比JSONP更强大。
 JSONP只支持GET请求，CORS支持所有类型的HTTP请求。JSONP的优势在于支持老式浏览器，以及可以向不支持CORS的网站请求数据。
+
+
