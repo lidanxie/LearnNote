@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>IndexDB</title>
+</head>
+<script>
+	function LinkRecord(name,url,desciption,notes) {
+		this.name = name;
+		this.url = url;
+		this.desciption = desciption;
+		this.notes = notes;
+	}
+
+	var database;
+	window.onload = function() {
+		var request = window.indexDB.open("linksDB", 1);
+		request.onsuccess = function(event) {
+			console.log("创建数据库成功！");
+			//让数据库在任何地方可以访问
+			database = request.result;
+			//调用showLinks()函数读取数据库，并显示已存在的链接列表：次函数下文会详细介绍
+			showLinks();
+		};
+
+		request.onerror = function(event) {
+			alert("发生下列错误：" + request.error);
+		};
+
+		request.onupgradeneeded = function(event) {
+			console.log("新建了数据库或数据库版本更新了");
+			var db = request.result;
+			var objectStore = db.createObjectStore("Links",{ kayPath: "url"})
+		};
+	}
+</script>
+<body>
+	
+</body>
+</html>

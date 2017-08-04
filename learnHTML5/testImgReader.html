@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>拖拽图片</title>
+	<style>
+		#dropBox {
+			margin: 15px;
+			width: 300px;
+			height: 300px;
+			border:5px dashed grey;
+			border-radius: 8px;
+			background: lightyellow;
+			background-size: 100%;
+			background-repeat: no-repeat;
+			text-align: center;
+		}
+		#dropBox div{
+			margin: 100px 70px;
+			color: orange;
+			font-size: 25px;
+		}
+	</style>
+</head>
+<script>
+	var dropBox;
+	window.onload = function() {
+		dropBox = document.getElementById("dropBox");
+		dropBox.ondragenter = ignoreDrag;
+		dropBox.ondragover = ignoreDrag;
+		dropBox.ondrop = drop;
+	}
+
+	function ignoreDrag(e) {
+		//因为我们在处理拖放，所以应该确保没有其他元素会取得这个事件
+		e.stopPropagation();
+		e.preventDefault();
+	}
+
+	function drop(e) {
+		//取消事件传播及默认行为
+		e.stopPropagation();
+		e.preventDefault();
+
+		//取得拖进来的文件
+		var data = e.dataTransfer;
+		var files = data.files;
+
+		//将其传给真正的处理文件的函数
+		processFiles(files);
+	}
+
+	function processFiles(files) {
+		var file = files[0];
+		//创建FileReader
+		var reader = new FileReader();
+
+		//告诉它准备好数据URL之后做什么
+		reader.onload = function(e) {
+			dropBox.style.backgroundImage = "url('" + e.target.result + "')";
+		};
+
+		//读取图片
+		reader.readAsDataURL(file);
+	}
+</script>
+<body>
+	<div id="dropBox">
+		<div>将你的图片拖到此处</div>
+	</div>
+</body>
+</html>
