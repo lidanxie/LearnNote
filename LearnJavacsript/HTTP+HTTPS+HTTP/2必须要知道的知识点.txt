@@ -1,0 +1,177 @@
+> 摘要：相比之前的传输协议，HTTP/2在底层方面做了很多优化。有安全、省时、简化开发、更好的适应复杂页面、提供缓存利用率等优势，阿里云早在去年发布的CDN6.0服务就已正式支持HTTP/2，访问速度最高可提升68%。
+
+###写在前面
+超文本传输协议（英文：HyperText Transfer Protocol，缩写：HTTP）是互联网上应用最为广泛的一种网络协议。设计 HTTP 最初的目的是为了提供一种发布和接收 HTML 页面的方法。通过 HTTP 或者 HTTPS 协议请求的资源由统一资源标识符（URI）来标识。虽然HTTP/1.1稳定运行了十多年了，但HTTP/2来势汹汹，作为技术工程师有必要学习一下HTTP/2。
+
+
+----------
+### 1.Web始祖HTTP
+
+> 处于计算机网络中的应用层，HTTP是建立在TCP协议之上，所以HTTP协议的瓶颈及其优化技巧都是基于TCP协议本身的特性，例如tcp建立连接的3次握手和断开连接的4次挥手以及每次建立连接带来的RTT延迟时间。
+
+#### （1）HTTP/0.9
+最早的原型，1991年发布，该版本极其简单，只支持 GET 方法，不支持 MIME 类型和各种 HTTP 首部等等。
+
+#### （2）HTTP/1.0
+1996年发布。HTTP/1.0在HTTP/0.9的基础之上添加很多方法，各种 HTTP 首部，以及对多媒体对象的处理。
+
+除了GET命令，还引入了POST命令和HEAD命令，丰富了浏览器与服务器的互动手段。
+
+任何格式的内容都可以发送。这使得互联网不仅可以传输文字，还能传输图像、视频、二进制文件。这为互联网的大发展奠定了基础。
+
+HTTP请求和回应的格式也变了。除了数据部分，每次通信都必须包括头信息（HTTP header），用来描述一些元数据。
+
+可以说，HTTP/1.0是对HTTP/0.9做了革命性的改变，但HTTP/1.0依然有一些缺点，其主要缺点是每个TCP连接只能发送一个请求，发送数据完毕后连接就关闭，如果还要请求其他资源，就得再新建一个连接。虽然有些浏览器为了解决这个问题，用了一个非标准的Connection头部，但这个不是标准头部，各个浏览器和服务器实现有可能不一致，因此不是根本解决办法。
+
+####（3）HTTP/1.1
+1999年正式发布。HTTP/1.1是当前主流的 HTTP 协议。完善了之前 HTTP 设计中的结构性缺陷，明确了语义，添加和删除了一些特性，支持更加复杂的的 Web 应用。
+
+经过了十多年将近20年的发展，这个版本的HTTP协议已经很稳定了，跟HTTP/1.0相比，它新增了很多引人注目的新特性，比如Host协议头、Range分段请求、默认持久连接、压缩、分块传输编码（chunked）、缓存处理等等，至今都大量使用，而且很多软件依赖这些特性。
+
+虽然HTTP/1.1并不像HTTP/1.0对于HTTP/0.9那样的革命性，但是也有很多增强，目前主流浏览器均默认采用HTTP/1.1。
+
+####（4） SPDY
+SPDY（发音：speedy）协议由Google开发，主要解决 HTTP/1.1 效率不高的问题，于2009年公开，到2016年初结束使命。因为HTTP/2已经被IETF标准化了，以后各种新版浏览器都会支持HTTP/2，Google认为SPDY已经没有存在的必要了，接下来的使命由HTTP/2去完成。
+
+#### （5）HTTP/2
+HTTP/2是最新的HTTP协议，已于2015年5月份正式发布， Chrome、 IE11、Safari以及Firefox 等主流浏览器已经支持 HTTP/2协议。
+
+注意是HTTP/2而不是HTTP/2.0，这是因为IETF（Internet Engineering Task Force，互联网工程任务组）认为HTTP/2已经很成熟了，没有必要再发布子版本了，以后要是有重大改动就直接发布HTTP/3。
+
+其实，HTTP/2的前身是SPDY，甚至它俩的目标、原理和基本实现都差不多。IETF组委会中有很多Google工程师，将SPDY推动成为标准也就不足为奇了。
+
+HTTP/2不仅优化了性能而且兼容了HTTP/1.1的语义，其几大特性与SPDY差不多，与HTTP/1.1有巨大区别，比如它不是文本协议而是二进制协议，而且HTTP头部采用HPACK进行压缩，支持多路复用、服务器推送等等。
+
+###2. HTTP与现代化浏览器
+早在HTTP建立之初，主要就是为了将超文本标记语言(HTML)文档从Web服务器传送到客户端的浏览器。也是说对于前端来说，我们所写的HTML页面将要放在我们的web服务器上，用户端通过浏览器访问url地址来获取网页的显示内容，但是到了WEB2.0以来，我们的页面变得复杂，不仅仅单纯的是一些简单的文字和图片，同时我们的HTML页面有了CSS，Javascript，来丰富我们的页面展示，当ajax的出现，我们又多了一种向服务器端获取数据的方法，这些其实都是基于HTTP协议的。同样到了移动互联网时代，我们页面可以跑在手机端浏览器里面，但是和PC相比，手机端的网络情况更加复杂，这使得我们开始了不得不对HTTP进行深入理解并不断优化过程中。 
+
+![这里写图片描述](http://img.blog.csdn.net/20170730155856127?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+### 3.HTTP 的基本优化
+影响一个HTTP网络请求的因素主要有两个：带宽和延迟。
+
+ - **带宽**：如果说我们还停留在拨号上网的阶段，带宽可能会成为一个比较严重影响请求的问题，但是现在网络基础建设已经使得带宽得到极大的提升，我们不再会担心由带宽而影响网速，那么就只剩下延迟了。
+ - **延迟**：
+
+
+
+ 1. **浏览器阻塞（HOL blocking）**：浏览器会因为一些原因阻塞请求。浏览器对于同一个域名，同时只能有 4 个连接（这个根据浏览器内核不同可能会有所差异），超过浏览器最大连接数限制，后续请求就会被阻塞。
+ 2. **DNS 查询（DNS Lookup）**：浏览器需要知道目标服务器的 IP 才能建立连接。将域名解析为 IP 的这个系统就是 DNS。这个通常可以利用DNS缓存结果来达到减少这个时间的目的。
+ 3.  **建立连接（Initial connection）**：HTTP 是基于 TCP 协议的，浏览器最快也要在第三次握手时才能捎带 HTTP 请求报文，达到真正的建立连接，但是这些连接无法复用会导致每次请求都经历三次握手和慢启动。三次握手在高延迟的场景下影响较明显，慢启动则对文件类大请求影响较大。
+ 
+![这里写图片描述](http://img.blog.csdn.net/20170730160935778?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+### 4. HTTP/1.0和HTTP/1.1的一些区别
+两者的区别主要体现在：
+
+ 1. **缓存处理**，在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。
+ 2. **带宽优化及网络连接的使用**，HTTP1.0中，存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能，HTTP1.1则在请求头引入了range头域，它允许只请求资源的某个部分，即返回码是206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。
+ 3. **错误通知的管理**，在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。
+ 4. **Host头处理**，在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname）。但随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都应支持Host头域，且请求消息中如果没有Host头域会报告一个错误（400 Bad Request）。
+ 5. **长连接**，HTTP 1.1支持长连接（PersistentConnection）和请求的流水线（Pipelining）处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启Connection： keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。
+
+**区别用一张图来体现：**
+
+![这里写图片描述](http://img.blog.csdn.net/20170730161657274?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+###5. HTTP1.0和1.1现存的一些问题
+
+ 1. 上面提到过的，HTTP1.x在传输数据时，每次都需要重新建立连接，无疑增加了大量的延迟时间，特别是在移动端更为突出。
+ 2. HTTP1.x在传输数据时，所有传输的内容都是明文，客户端和服务器端都无法验证对方的身份，这在一定程度上无法保证数据的安全性。
+ 2. HTTP1.x在使用时，header里携带的内容过大，在一定程度上增加了传输的成本，并且每次请求header基本不怎么变化，尤其在移动端增加用户流量。
+ 3. 虽然HTTP1.x支持了keep-alive，来弥补多次创建连接产生的延迟，但是keep-alive使用多了同样会给服务端带来大量的性能压力，并且对于单个文件被不断请求的服务(例如图片存放网站)，keep-alive可能会极大的影响性能，因为它在文件被请求之后还保持了不必要的连接很长时间。
+
+
+### 6.HTTPS应声而出
+为了解决以上问题，网景在1994年创建了HTTPS，并应用在网景导航者浏览器中。 最初，HTTPS是与SSL一起使用的；在SSL逐渐演变到TLS时（其实两个是一个东西，只是名字不同而已），最新的HTTPS也由在2000年五月公布的RFC 2818正式确定下来。简单来说，HTTPS就是安全版的HTTP，并且由于当今时代对安全性要求更高，chrome和firefox都大力支持网站使用HTTPS，苹果也在ios 10系统中强制app使用HTTPS来传输数据，由此可见HTTPS势在必行。  
+这里简单介绍一下HTTPS，接下来将会写一篇有关于HTTPS详解的文章。
+
+### 7.HTTPS与HTTP的一些区别
+
+ 1. HTTPS协议需要到CA申请证书，一般免费证书很少，需要交费。
+ 2. HTTP协议运行在TCP之上，所有传输的内容都是明文，HTTPS运行在SSL/TLS之上，SSL/TLS运行在TCP之上，所有传输的内容都经过加密的。
+ 3. HTTP和HTTPS使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。
+ 4. HTTPS可以有效的防止运营商劫持，解决了防劫持的一个大问题。
+ 
+ ![这里写图片描述](http://img.blog.csdn.net/20170730163111105?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+### 8.使用SPDY加快你的网站速度
+上文中提到了由Google开发，主要解决 HTTP/1.1 效率不高的问题的SPDY协议，SPDY可以说是综合了HTTPS和HTTP两者有点于一体的传输协议，主要解决：
+
+ 1. **降低延迟**，针对HTTP高延迟的问题，SPDY优雅的采取了多路复用（multiplexing）。多路复用通过多个请求stream共享一个tcp连接的方式，解决了HOL blocking的问题，降低了延迟同时提高了带宽的利用率。
+ 2. **请求优先级（request prioritization）**。多路复用带来一个新的问题是，在连接共享的基础之上有可能会导致关键请求被阻塞。SPDY允许给每个request设置优先级，这样重要的请求就会优先得到响应。比如浏览器加载首页，首页的html内容应该优先展示，之后才是各种静态资源文件，脚本文件等加载，这样可以保证用户能第一时间看到网页内容。
+ 3. **header压缩**。前面提到HTTP1.x的header很多时候都是重复多余的。选择合适的压缩算法可以减小包的大小和数量。
+ 4. **基于HTTPS的加密协议传输**，大大提高了传输数据的可靠性。
+ 5. **服务端推送（server push）**，采用了SPDY的网页，例如我的网页有一个sytle.css的请求，在客户端收到sytle.css数据的同时，服务端会将sytle.js的文件推送给客户端，当客户端再次尝试获取sytle.js时就可以直接从缓存中获取到，不用再发请求了。SPDY构成图：
+ 
+ ![这里写图片描述](http://img.blog.csdn.net/20170730163808039?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+SPDY位于HTTP之下，TCP和SSL之上，这样可以轻松兼容老版本的HTTP协议(将HTTP1.x的内容封装成一种新的frame格式)，同时可以使用已有的SSL功能。
+
+**兼容性：**
+![这里写图片描述](http://img.blog.csdn.net/20170730163914684?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+### 9. HTTP/2新特性
+
+#### （1）二进制协议
+HTTP/2 采用二进制格式传输数据，而非HTTP/1.x的文本格式。消息头和消息体均采用二进制格式，并称之为”帧“（Frame）。Frame二进制基本格式如下：
+
+![这里写图片描述](http://img.blog.csdn.net/20170730164518874?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+之所以说是基本格式，是因为所有HTTP/2 Frame都是由该基本格式来封装，类似于TCP头，目前有10个Frame，由Type字段来区分，各个Frame都有自己的二进制格式，都封装Frame Payload中。
+
+其中有两个重要的Frame：Headers Frame（Type=0x1）和Data Frame（Type=0x0），分别对应HTTP/1.1中的消息头（Header）和消息体（Body），由此可见语义并没有太大变化，而是文本格式变成二进制的Frame。二者的转换和关系如下图（摘自 《High Performance Browser Networking》）：
+
+![这里写图片描述](http://img.blog.csdn.net/20170730165355255?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+此外，HTTP/2中还有流（Stream）和消息（Message）的概念：
+
+ - **流**：流是连接中的一个虚拟信道，可以承载双向的消息；每个流都有一个唯一的整数标识符（1、2…N）；流中包含消息，这个消息对应HTTP/1.x的请求消息（Request Message）或者响应消息（Response Message）。
+ - **消息**：是指逻辑上的 HTTP 消息，比如请求、响应等，由一或多个帧组成，消息是通过帧（Frame）来传输的，响应消息比较大，可能由多个Data Frame来传输。
+ - **帧**：HTTP 2.0 通信的最小单位，每个帧包含帧首部，至少也会标识出当前帧所属的流，承载着特定类型的数据，如 HTTP 首部、负荷，等等
+![这里写图片描述](http://img.blog.csdn.net/20170730165637098?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+#### （2）头部压缩
+
+![这里写图片描述](http://img.blog.csdn.net/20170730165754965?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+HTTP/1.x 每次请求和响应，都会携带大量冗余消息头信息，比如Cookie和User Agent，基本一样的内容，每次请求浏览器都会默认携带，这会浪费很多带宽资源，也影响了速度。这是因为HTTP是无状态协议，每次请求都必须附上所有信息，从而导致了每次请求都带上大量重复的消息头。
+
+为此，HTTP/2做了优化，对消息头采用HPACK格式进行压缩传输，并对消息头建立索引表，相同的消息头只发送索引号，从而提高效率和速度。但付出的代价是客户端和服务器均维护一个索引表，在如今内存不值钱的时代，这点空间换取时间还是非常值得的。
+
+关于HPACK请参考[RFC7541](https://tools.ietf.org/html/rfc7541)。
+
+#### （3）多路复用
+多路复用是指在一个TCP连接里，客户端和服务器都可以同时发送多个请求或者响应，对HTTP/1.x来说各个请求和响应都是有严格的次序要求，而在HTTP/2中，不用按照次序一一对应，而且并发的多个请求或者响应中任何一个请求阻塞了不会影响其他的请求或者响应，这样就避免了“队头堵塞”
+
+#### （4）服务器推送
+HTTP 2.0 新增的一个强大的新功能，就是服务器可以对一个客户端请求发送多个响应。服务器向客户端推送资源无需客户端明确地请求。
+服务器推送（Server Push）是指在HTTP/2中服务器未经请求可以主动给客户端推送资源。例如服务端可以主动把 图片、JS 和 CSS 文件推送给浏览器，而不需要浏览器解析HTML后再发送这些请求。当浏览器解析HTML后这些需要的资源都已经在浏览器里了，大大提高了网页加载的速度。
+
+![这里写图片描述](http://img.blog.csdn.net/20170730170326139?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+ - HTTP 2.0 连接后，客户端与服务器交换SETTINGS 帧，借此可以限定双向并发的流的最大数量。因此，客户端可以限定推送流的数量，或者通过把这个值设置为0 而完全禁用服务器推送。
+ - 所有推送的资源都遵守同源策略。换句话说，服务器不能随便将第三方资源推送给客户端，而必须是经过双方确认才行。
+ - PUSH_PROMISE：所有服务器推送流都由PUSH_PROMISE 发端，服务器向客户端发出的有意推送所述资源的信号。客户端接收到PUSH_PROMISE 帧之后，可以视自身需求选择拒绝这个流。
+ 
+ **几点限制：**
+ 
+ - 服务器必须遵循请求- 响应的循环，只能借着对请求的响应推送资源。
+ - PUSH_PROMISE 帧必须在返回响应之前发送，以免客户端出现竞态条件。
+
+#### （5）安全
+HTTP的安全是由SSL/TLS来保障，也就是HTTPS，其实HTTP/2并不强制要求依赖SSL/TLS，但是，当前主流浏览器均只支持基于SSL/TLS的HTTP/2，况且在网络劫持日益猖獗的互联网环境下，HTTPS将是未来的趋势，HTTP/2基于HTTPS也是未来的趋势，而各大主流浏览器在实现HTTP/2之初均只支持SSL/TLS的HTTP/2，可见安全也是HTTP/2的重要特性之一。
+
+
+----------
+###写在最后
+相比之前的传输协议，HTTP/2在底层方面做了很多优化。有安全、省时、简化开发、更好的适应复杂页面、提供缓存利用率等显著的优势，各大公司也已经纷纷开始使用HTTP/2协议了。
+
+*参考文章：*
+
+ - [http://www.alloyteam.com/2016/07/httphttp2-0spdyhttps-reading-this-is-enough/#prettyPhoto](http://www.alloyteam.com/2016/07/httphttp2-0spdyhttps-reading-this-is-enough/#prettyPhoto)
+ - [http://blog.csdn.net/zqjflash/article/details/50179235](http://blog.csdn.net/zqjflash/article/details/50179235)
+ - [http://www.jianshu.com/p/748c7ca7c50f](http://www.jianshu.com/p/748c7ca7c50f)
+
+
+ 
