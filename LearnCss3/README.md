@@ -158,7 +158,7 @@ box-orient: horizontal | vertical | inline-axis | block-axis
 </html>
 ```
 
-![image](http://note.youdao.com/favicon.ico)
+![box-orient](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-orient.png)
 
 ### 3. 布局顺序 box-direction
 `box-direction`属性主要是用来设置伸缩项目在伸缩容器中流动顺序。
@@ -169,9 +169,9 @@ box-direction: normal | reverse
 * normal: 表示伸缩项目从主轴起始点开始按文档流结构，从上到下按顺序排列。
 * reverse: 表示伸缩项目从主轴终点开始按文档流结构反向，从下往上排列。
 
-[box-direction.html](http://note.youdao.com/)
+[box-direction.html](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/box-direction.html)
 
-![image](http://note.youdao.com/favicon.ico)
+![box-direction](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-direction.png)
 
 ### 4. 伸缩换行 box-lines
 `box-lines`可以用来设置伸缩容器的伸缩项目是单行还是多行显示。默认情况下都是单行或单列显示。
