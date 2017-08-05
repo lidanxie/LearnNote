@@ -67,7 +67,7 @@ display: box | inline-box
 </html>
 ```
 
-![image](http://note.youdao.com/favicon.ico)
+![image](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box.png)
 
 ### 2.伸缩流方向 box-orient
 > 伸缩流方向`box-orient` 属性主要用来创建主轴，从而定义了伸缩项目在伸缩容器中的流动布局方向。换句话说主要用来指定伸缩项目如何放置在伸缩容器的主轴上。
