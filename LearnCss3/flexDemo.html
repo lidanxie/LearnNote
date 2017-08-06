@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>flex的基本使用</title>
+			<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		.box {
+			width: 960px;
+			margin: 20px auto;
+			min-height: 300px;
+			color: #fff;
+			font-weight: bold;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-flex-flow: row nowrap;
+			justify-content: space-around;
+			-webkit-align-items: stretch;
+		}
+		.box > div {
+			padding: 10px;
+		}
+		.box > div:nth-child(1) {
+			background-color: hsla(120, 30%, 50%, 0.8);
+			-webkit-flex: 1 200px;
+			flex: 1 200px;
+		}
+		.box > div:nth-child(2) {
+			background-color: hsla(120, 30%, 10%, 0.8);
+			-webkit-flex: 2 400px;
+			flex: 2 400px;
+		}
+		.box > div:nth-child(3) {
+			background-color: hsla(20, 30%, 50%, 0.8);
+			-webkit-flex: 1 200px;
+			flex: 1 200px;
+		}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<div>box1</div>
+		<div>box2</div>
+		<div>box3</div>
+	</div>
+</body>
+</html>

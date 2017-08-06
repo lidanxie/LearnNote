@@ -257,3 +257,120 @@ box-ordi nal-group: <integer>
 伸缩项目的box-ordinal-group的值越大，伸缩项目排在后面。
 
 [box-ordinal-group的demo](http://note.youdao.com/)
+
+## 二、混合版本Flexbox模型基本使用：chrome浏览器不兼容
+### 1.伸缩容器设置 display
+
+```
+display: flexbox | inline-flexbox
+```
+* flexbox：设置元素为块级伸缩容器
+* inline-flexbox：设置元素为内联块级伸缩容器
+
+伸缩布局模型混合版本主要用于IE10浏览器，在使用混合版本时需要使用浏览器前缀"-ms-"
+
+```
+.element { display: -ms-flexbox }
+```
+
+### 2.伸缩流方向 flex-direction
+flex-direction 与旧版语法中的box-orient属性一样，定义伸缩项目放置在伸缩容器的方向。
+
+
+```
+-ms-flex-direction: row | row-reverse | column | column-reverse
+```
+* row:初始值。伸缩项目按照它们在文档流中出现的顺序进行显示。其中文本书写模式直接影响了文档流的方向。如果文本的书写模式为ltr,则伸缩项目从左到右排列，如果为rtl,则伸缩项目从右到左排列。
+* row-reverse:与 row 相反，如果文本的书写模式为ltr,则伸缩项目从右到左排列，如果为rtl,则伸缩项目从左到右排列。
+* column:按照它们在文档流出现的顺序按列从上到下排列
+* column-reverse:与column相反，伸缩项目从下到上排列。
+
+## 三、最新版本Flexbox模型基本使用
+
+### 1.伸缩容器
+
+```
+display: flex | inline-flex
+```
+参数同旧版本中box一样的用法。
+
+### 2. 伸缩流方向 flex-direction
+
+```
+flex-direction: row | row-reverse | colum | column-reverse
+```
+* row: 在ltr排版方式下从左到右排列，在rtl排版方式下从右到左排列。
+* row-reverse: 与row相反
+* column: 类似于row:从上到下排列
+* column-reverse:与column相反，从下到上排列。
+
+
+### 3.伸缩换行 flex-wrap
+主要用来定义伸缩容器里是单行还是多行显示。
+* nowrap: 单行显示，ltr排版下，伸缩项从左到右排列，rtl从右到左排列
+* wrap:多行显示，ltr排版下，从左到右排列，rtl下从右到左排列
+* wrap-reverse:多行显示，与wrap相反。
+
+### 4. 伸缩流方向与换行 flex-flow
+
+```
+flex-flow: <'flex-direction'> || <'flex-wrap'>
+```
+
+### 5.主轴对齐 justify-content
+主要用来定义伸缩项目沿着主轴线的对齐方式。
+
+```
+justify-content: flex-start | flex-end | center | space-between | space-around
+```
+* flex-start:向其实位置靠齐
+* flex-end： 向结束位置靠齐
+* center：向中间位置靠齐
+* space-between：平均地分布在行里。第一个伸缩项目在一行中的最开始位置，最后一个伸缩项目在一行中的最终点位置。
+* space-around： 伸缩项目会平均分布在行里，两端保留一半的空间。
+
+
+### 6. 侧轴对齐 align-items 和 align-self
+align-items 和 justify-content 相呼应。align-items调整伸缩项目在侧轴上的定位方式，主要用来定义伸缩项目可以在伸缩容器的当前行的侧轴上对齐方式。
+
+```
+align-items: flex-start |flex-end | center | baseline | stretch
+```
+* flex-start: 在侧轴起点边
+* flex-end：在侧轴终点边
+* center：在侧轴上居中放置
+* baseline： 基线对齐
+* stretch： 拉伸填充
+
+align-self属性主要用来设置单独伸缩项目在侧轴的对齐方式，值和aligin-self一样。
+
+
+### 7. 堆栈伸缩行 align-content
+align-content属性主要用来调准伸缩容器里的对齐方式。
+
+```
+align-content: flex-start | flex-end | center | space-between | space-around | stretch
+```
+* flex-start: 在伸缩容器起点位置
+* flex-end：在伸缩容器终点位置
+* center：在伸缩容器中间位置
+* space-between： 平均分布
+* space-around：平均分布，两边各有一半的空间
+* stretch：默认值，各行将会伸展以占用额外的空间。
+
+
+### 8.伸缩性 flex
+
+```
+flex: none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ] 
+```
+用来指定可伸缩长度的部件：扩展比率，收缩比率，以及伸缩基准值。
+
+[flexDemo.html](http://note.youdao.com/)
+
+### 9. 显示顺序 order
+
+```
+order: <number>
+```
+[flex-order.html](http://note.youdao.com/)
