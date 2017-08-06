@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>box-flex</title>
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			color: #fff;
+			font-size: 20px;
+		}
+		.box-flex {
+			/*伸*/
+			/*width: 960px;*/
+			/*收缩*/
+			width: 410px;
+			background: gray;
+			margin: 100px;
+			display: -webkit-box;
+			display: -moz-box;
+			display: box;
+		}
+/* 		 .box-flex p {   
+			-moz-box-flex: 1;
+			-webkit-box-flex: 1;
+			box-flex: 1;
+		}  */
+		.box-flex p:first-child {
+			background: green;
+			/*设为1*/
+			 -moz-box-flex: 1;
+			-webkit-box-flex: 1;
+			box-flex: 1; 
+		}
+		.box-flex p:last-child {
+			background: orange;
+			/*设为2*/
+			 -moz-box-flex: 3;
+			-webkit-box-flex: 3;
+			box-flex: 3; 
+		}
+	</style>
+</head>
+<body>
+	<div class="box-flex">
+		<p>绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色绿色</p>
+		<p>橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色橙色</p>
+	</div>
+</body>
+</html>
