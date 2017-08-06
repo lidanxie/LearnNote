@@ -195,3 +195,63 @@ box-pack: start | end | center | justify
 * end: 和 start 值相反，伸缩项目向一行的结束位置靠齐。伸缩容器沿着布局轴方向的额外空间都被置于布局轴的开始。
 * center: 伸缩项目向一行的中间位置靠齐。伸缩容器所有额外空间平均分布在第一伸缩项目前面和最后一个伸缩项目的后面。
 * justify: 伸缩项目会平均分布在一行里。伸缩容器所有额外空间平均分布在所有伸缩项目之间，而且在第一个伸缩项目之前和最后一个伸缩项目之后不分配伸缩容器的任何额外空间。
+
+### 6.侧轴对齐 box-align
+box-align是用来管理伸缩容器侧轴方向的额外空间，也就是垂直于主轴方向。
+
+```
+box-align: start | end | center | baseline | stertch
+```
+* start: 伸缩项目顶部边缘放置在伸缩容器的顶端，伸缩容器的额外空间放置在伸缩项目底端。
+* end: 与start相反。
+* center: 伸缩项目紧靠在一起，垂直居中于伸缩容器。伸缩容器额外的空间平均分配在伸缩项目的顶部和底部。
+* baseline: 伸缩项目根据它们的极限对齐。伸缩容器额外空间可前可后显示。
+* stretch: 伸缩项目填充整个伸缩容器。
+
+[demo](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/box-align.html)
+
+![start](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-align-start.png)
+![end](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-align-end.png)
+![center](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-align-center.png)
+![baseline](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-align-baseline.png)
+![stertch](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-align-stertch.png)
+
+### 7. 伸缩性 box-flex
+box-flex属性嗯呢该个灵活地控制伸缩项目在伸缩容器中的显示空间。
+在一个水平导向框中，首先会计算每个伸缩项目的宽度。如果所有伸缩项目宽度的和与伸缩容器宽度相等，伸缩容器就没有额外的空间，这个时候运用在伸缩项目的宽度是每个伸缩项目的其次宽度；如果伸缩项目宽度之和小于伸缩容器宽度，这时伸缩容器有额外空间可用，伸缩项目会根据box-flex对应的比例进行扩展。如果伸缩项目的宽度之和大于伸缩容器宽度，伸缩容器没有足够空间，这时伸缩项目会根据box-flex的比例值对伸缩项目进行收缩，以防止伸缩项目溢出伸缩容器。
+
+
+```
+box-flex: <number>
+```
+
+伸缩项目具体增加或减小的宽度值取决于伸缩项目的固有的宽度的比例，而不是某个绝对的数值。设置了box-flex值的伸缩项目是按照特定比例来弹性适应的。举个例子，一个伸缩项目设置box-flex值为2，另一个伸缩项目设置box-flex值为1，伸缩容器额外的宽度将分成三等分，设置box-flex为2的伸缩项目会占两份，而设置box-flex为1的伸缩项目会占一份。
+
+![未设置box-flex](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/none-box-flex.png)
+![box-flex-1](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-flex-1.png)
+
+把两个伸缩项目都设置box-flex值为1，就会把伸缩容器额外的空间210px平均分成两份，添加到每个伸缩项目上，这个时候绿色的伸缩项目不再是内容宽度，而是345px(240+105),橙色的伸缩项目宽度不再是内容的宽度，而是615px(510+105)
+
+![1:2的比例](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-flex-1-2.png)
+
+##### 收缩
+
+box-flex的比例3:1，伸缩项目收缩的效果
+![比例3:1](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-flex-strecth-1-3.png)
+
+[box-flex的demo](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/box-flex.html)
+
+### 8. 显示顺序 box-ordinal-group
+box-ordinal-group属性可以修改伸缩项目在页面中的显示顺序，也可以用这个属性实现排序组。
+
+
+```
+box-ordinal-group: <integer>
+```
+默认值为1
+
+![设置了box-ordinal-group](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/img/box-ordinal-group.png)
+
+伸缩项目的box-ordinal-group的值越大，伸缩项目排在后面。
+
+[box-ordinal-group的demo](https://github.com/lidanxie/LearnNote/blob/master/LearnCss3/box-ordinal-group.html)
