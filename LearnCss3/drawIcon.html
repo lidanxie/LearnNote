@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>画图标</title>
+	<style type="text/css">
+		body {
+			background-color: #282828;
+			background-image: 
+				-webkit-radial-gradient(black 15%, transparent 16%),
+				-webkit-radial-gradient(black 15%, transparent 16%),
+				-webkit-radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 20%),
+				-webkit-radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 20%);
+			background-image: 
+				radial-gradient(black 15%, transparent 16%),
+				radial-gradient(black 15%, transparent 16%),
+				radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 20%),
+				radial-gradient(rgba(255, 255, 255, 0.1) 15%, transparent 20%);
+			background-position: 0 0px, 8px 8px, 0 1px, 8px 9px;
+			background-size: 16px 16px;
+		}
+		.button {
+			width: 70px;
+			height: 70px;
+			margin-right: 90px;
+			font-size: 0;
+			border-radius: 50%;
+			border: none;
+			box-shadow: 
+				0 1px 5px rgba(255, 255, 255, .5) inset,
+				0 -2px 5px rgba(0, 0, 0, .3) inset,
+				0 3px 8px rgba(0, 0, 0, .8);
+			background: -webkit-radial-gradient(circle at top center, #f28fb8, #e982ad, #ec568c);
+			background: radial-gradient(circle at top center, #f28fb8, #e982ad, #ec568c);
+		}
+		/*调用本地字体*/
+		@font-face {
+			font-family: 'icomoon';
+			src: url();
+		}
+	</style>
+</head>
+<body>
+	<button type="button" class="button">chrome</button>
+	<button type="button" class="button">firefox</button>
+	<button type="button" class="button">IE</button>
+</body>
+</html>
