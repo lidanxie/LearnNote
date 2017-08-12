@@ -1,0 +1,204 @@
+2017/7/29
+cvte提前批笔试
+1.哪些协议同时使用UDP和TCP协议
+DNS
+
+2.排序算法：稳定与不稳定
+不稳定算法：①堆排序  ②快速排序  ③希尔排序  ④直接选择排序
+稳定算法：①基数排序 ②冒泡排序 ③直接插入排序 ④折半插入排序 ⑤归并排序
+
+3.二叉树：将一棵有111个节点的完全二叉树从根这一层开始，每一层从左到右依次对节点进行编号，根节点编号为1，则编号最大的非叶子节点的编号为   55
+
+4.判断两个URL是不是相同的域：协议、域名、端口号
+
+5.js返回上一页
+history.back(),history.forward(),history.go(-1),
+取巧的方法：document.referrer = document.location.href
+
+6.正则表达式
+
+7.slice()方法：提供几个参数，最后一个参数为负数事，表示从尾部开始取得几个数，为正数时表示从前往后取几个数
+
+8.replace()函数：替换查找到的值
+
+9.当script标签附上了async属性时，该段要引用的脚本会发生什么？
+
+10.prototype原型：很多
+
+11.css在正常情况下加载的过程中会进行哪些行为？
+思考：  A:阻塞渲染但不阻塞DOM解析
+	B:阻塞渲染且阻塞DOM解析
+	C:不阻塞渲染但阻塞DOM解析
+	D:不阻塞渲染且不阻塞DOM解析
+
+12：大题：
+编写一个程序，计算一个HTML页面中使用便签次数最多的标签，并计算次数。
+
+13：大题：完成一个ejs的模板解析函数
+原题：请实现template方法，用于解析模板，实现的效果如下：
+javascript
+var compiled = template("hello <%= user %>");
+compiled({"user": "world"});
+
+2017/8/1 
+拼多多笔试
+1.
+var obj1 = new String('abcdefgh');
+    
+var obj2 = new String('abcdefgh');
+    
+console.log(obj1 == obj2);
+  //false    
+console.log(obj1 === obj2);   //false
+
+2.
+function one() {
+    this.name = 1;
+    function two() {
+        this.name = 2;
+        function three(){
+            var name = 3;
+            console.log(this.name);
+        }
+        return three;
+    }
+    return two
+}
+one()();
+
+//打印结果
+function three(){
+   
+  var name = 3;
+          
+  console.log(this.name);
+       
+}
+
+3.opacity: 0;可以让使元素不可见，
+<div class="one">hello world!</div>
+.one{
+	opacity: 0;   /*不可见*/
+		} 
+.one {   /*可见*/
+	width: 0;
+	height: 0;
+} 
+.one {    /*可见*/
+	z-index: -100;
+} 
+
+4.
+var i = 1;
+(function () {
+	var start = new Date().getTime();
+	var si = setInterval(function () {
+		var now = new Date().getTime();
+		if(now < (start + 100)){
+			i++;
+		}else {
+			console.log(i);
+			clearInterval(si);
+		}
+	})
+})();  //结果不确定
+
+
+5.状态码
+400（错误请求）
+
+服务器不理解请求的语法。
+
+401（未授权）
+
+请求要求身份验证。对于登录后请求的网页，服务器可能返回此响应。
+
+403（禁止）
+
+服务器拒绝请求。如果您在 Googlebot 尝试抓取您网站上的有效网页时看到此状态码（您可以在 Google 网站管理员工具诊断下的网络抓取页面上看到此信息），可能是您的服务器或主机拒绝了 Googlebot 访问。
+
+404（未找到）
+
+服务器找不到请求的网页。例如，对于服务器上不存在的网页经常会返回此代码。
+如果您的网站上没有 robots.txt 文件，而您在 Google 网站管理员工具“诊断”标签的 robots.txt 页上看到此状态码，则这是正确的状态码。但是，如果您有 robots.txt 文件而又看到此状态码，则说明您的 robots.txt 文件可能命名错误或位于错误的位置（该文件应当位于顶级域，名为 robots.txt）。
+如果对于 Googlebot 抓取的网址看到此状态码（在”诊断”标签的 HTTP 错误页面上），则表示 Googlebot 跟随的可能是另一个页面的无效链接（是旧链接或输入有误的链接）。
+
+6.setTimeout 和 setInterval的区别
+
+
+7.水平居中一个元素
+
+
+
+2017/8/12  网易内推笔试
+
+1.this指向new方法产生的实例对象吗？
+
+对
+
+2.html5中section用法
+
+section 表示一段专题性的内容，一般会带有标题。
+
+3.从10000000个数中选择最小的20个数，比较方便的算法是:堆排序
+
+4.
+let string = 'string';
+let number = 0;
+let bool = true;
+
+console.log(number || string);  //string
+console.log(number && number);   //0
+console.log(bool || number);   //true
+console.log(bool && number);   //0
+
+5.
+setTimeout(function() {
+	console.log(1)
+}, 100);
+
+setTimeout(function() {
+	console.log(2);
+}, 0);
+
+console.log(3);   //3,2,1
+
+6.二分查找不能用于什么？
+不能用于查找链表
+
+7.匹配src中的内容
+
+8.
+var arr = [];
+console.log(typeof arr);  //object
+
+9.彩色砖块
+例如：s="ABAB"，那么小易有6中排序的结果：“AABB”,"ABAB","ABBA","BABA","BBAA",
+其中"AABB"和"BBAA"满足最多只有一对不同颜色的相邻的砖块。
+
+输入描述：
+输入一个字符串S，字符串的长度length(1<length<50),s中每个字符都为大写字母。
+
+输出描述：
+输出一个整数，表示小易可以有多少种方式。
+
+例子：
+输入:ABAB
+输出：2
+
+分析：设颜色为s,那么 if s > 2 ans =0
+else ans = s;
+
+function findeDouble(str) {
+	var Str = new Set();
+	for(let i = 0; i < str.length; i++) {
+		Str.add(str[i]);
+	}
+	let ans = Str.size;
+	if(ans > 2) ans = 0;
+	console.log(ans);
+}
+let str = 'ABAB';
+findeDouble(str);
+
+
