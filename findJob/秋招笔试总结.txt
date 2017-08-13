@@ -189,6 +189,24 @@ console.log(typeof arr);  //object
 分析：设颜色为s,那么 if s > 2 ans =0
 else ans = s;
 
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+string s;
+set<char> S;
+int main() {
+    cin >> s;
+    for(int i = 0; i < s.size(); i++) S.insert(s[i]);
+    int ans = S.size();
+    if(ans > 2) ans = 0;
+    cout << ans << endl;
+    return 0;
+}
+
+
+/*********************js写的不完全通过********************/
 function findeDouble(str) {
 	var Str = new Set();
 	for(let i = 0; i < str.length; i++) {
@@ -201,4 +219,102 @@ function findeDouble(str) {
 let str = 'ABAB';
 findeDouble(str);
 
+10.
+如果一个01串任意两个相邻位置的字符都是不一样的，我们就叫这个01串为交错01串，如 1,10101, 010101都是交错01串。
+小易现在有一个01串s，小易想找出最长的连续子串，并且这个子串为交错01串，
 
+输入描述：
+输入一个字符串，字符串由0和1组成。
+
+输出描述：
+输出一个整数，表示最长的满足要求的最长子串的长度。
+
+如：
+输入：1010111
+输出：5
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+string s;
+int main() {
+    cin >> s;
+    int ans = 1, cnt = 1;
+    for(int i = 1; i < s.size(); i++) {
+        if(s[i] != s[i - 1]) {
+            cnt++;
+        } else {
+            cnt = 1;
+        }
+        ans = max(ans, cnt);
+    }
+    cout << ans << endl;
+    return 0;
+}
+
+
+/**********js不完全通过*************/
+function findeMaxLength(str) {
+	let count = 1;
+	let max = 0;
+	let first = 1;  //起始坐标
+	for(let i = 1; i < str.length; i++) {
+		if (str.charAt(i) !== str.charAt(i-1)) {
+			count ++;
+		}else {
+			count = 1;
+		}
+		max = count > first ? count : first;
+
+	}
+	return max;
+}
+
+let str = '1110';
+
+console.log(findeMaxLength(str));
+
+11.独立的小易
+小易一个人独立出去生活，小易每天必须吃一个水果并且需要每天支付x元的房租，当前小易已有f个水果和d元钱，小易去商场也能卖到水果，商场每个水果售卖p元，小易最多能独立生活几天？
+
+输入描述：
+输入一行，包括x,f,d,p(1<=x,f,d,p,p<2*10^9)以空格分开
+
+输出描述：
+输出一个整数，表示小易最多能生活几天。
+
+分析：首先计算能保证的房屋能租几天，如果有剩余再考虑购买水果，
+
+c++
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+int x, f, d, p;
+int solve(int x, int f, int d, int p) {
+    int tmp1 = d / x;
+    if(tmp1 <= f) return tmp1;
+    d -= f * x;
+    return f + d / (x + p);
+}
+int main() {
+    cin >> x >> f >> d >> p;
+    cout << solve(x, f, d, p) << endl;
+    return 0;
+}
+
+
+/**********js不完全通过************/
+function maxDay( x, f, d, p) {
+	let temp = Math.floor(d/x);
+	if(temp <= f) return temp;
+	d -= f*x;
+	return Math.floor(f+d/(x+p));
+}
+let x = 3;  
+let f =5;
+let d = 100;
+let p = 10;
+console.log(maxDay(x,f,d,p));

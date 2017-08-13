@@ -1,21 +1,19 @@
 function findeMaxLength(str) {
-	let count = 0;
+	let count = 1;
 	let max = 0;
-	let first = 0;  //起始坐标
-	let last = 0;   //结束坐标
-	for(let i = 0; i < str.length; i++) {
-		if (str.charAt(i) !== str.charAt(i+1)) {
-			last = i+1;
-			count = last - first + 1;
-			max = count > max ? count : max;
+	let first = 1;  //起始坐标
+	for(let i = 1; i < str.length; i++) {
+		if (str.charAt(i) !== str.charAt(i-1)) {
+			count ++;
 		}else {
-			first = i+1;
+			count = 1;
 		}
+		max = count > first ? count : first;
 
 	}
 	return max;
 }
 
-let str = '10101010101';
+let str = '1110';
 
 console.log(findeMaxLength(str));

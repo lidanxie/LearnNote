@@ -5,7 +5,7 @@ function findeDouble(str) {
 	}
 	let ans = Str.size;
 	if(ans > 2) ans = 0;
-	console.log(ans);
+	return ans;
 }
 let str = 'ABAB';
-findeDouble(str);
+console.log(findeDouble(str));
