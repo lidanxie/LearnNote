@@ -294,9 +294,10 @@ using namespace std;
 
 int x, f, d, p;
 int solve(int x, int f, int d, int p) {
-    int tmp1 = d / x;
+    int tmp1 = d / x;    
     if(tmp1 <= f) return tmp1;
     d -= f * x;
+    cout << f + d / (x + p) << endl;
     return f + d / (x + p);
 }
 int main() {

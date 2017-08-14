@@ -1,8 +1,7 @@
 function maxDay( x, f, d, p) {
 	let temp = Math.floor(d/x);
 	if(temp <= f) return temp;
-	d -= f*x;
-	return Math.floor(f+d/(x+p));
+	return Math.floor(d -= f*x);
 }
 let x = 3;  
 let f =5;
