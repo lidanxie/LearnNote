@@ -1,14 +1,40 @@
 const nodemailer = require('nodemailer');
 
 //开启SMTP连接池
-let transporter = 
+let transporter = nodemailer.createTransport({
+	host: 'smtp.qq.com',
+	secureConnection: true,  //use SSL
+	port: 465,
+	secure: true,  //secure: true for port 465, secure:false for port 587
+	auth: {
+		user: '987905457@qq.com',
+		pass: 'rjtexjiwkidcbcgi'  //授权码
+	}
+});
 
-https://nodemailer.com/about/
-http://www.lovebxm.com/2017/07/21/node-mail/
-https://segmentfault.com/a/1190000010291860
+//设置邮件内容（谁发送什么给谁）
+let mailOptions = {
+	from: '"谢丽丹"<987905457@qq.com>',  //发件人
+	to: 'xingxi.xie@gmail.com',   //收件人
+	subject: 'Hello',  //主题
+	text: '这是一封来自nodejs的测试邮件',  //文本内容
+	html: '<b>这是一封来自nodejs的测试邮件</b>',  //html body
+	//下面是发送附件，不需要就注释掉
+	attachments: [{
+		filename: 'test.txt',
+		path: './test.txt',
+	},
+	{
+		filename: 'content',
+		content: '发送内容'
+	}]
+};
 
-
-/** superagent */
-http://www.jianshu.com/p/74232649e228
-http://www.jianshu.com/p/98b854322260
-https://cnodejs.org/topic/5378720ed6e2d16149fa16bd
+//使用先前创建的传输器的sendMail方法传递消息对象
+transporter.sendMail(mailOptions, (error, info) => {
+	if(error) {
+		return console.log(error);
+	}
+	console.log('message: ${info.messageId}');
+	console.log('sent: ${info.response}');
+});

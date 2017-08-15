@@ -167,3 +167,71 @@ module.exports = router;
 
 ```
 
+# 三、使用Nodejs发送邮件
+尝试用了Nodemailer来发送邮件，结果成功了，虽然是相对比较简单的，但还是记录一下吧。
+
+[Nodemailer](https://nodemailer.com/about/) 是 Node.js 应用程序的一个模块，可以方便地发送电子邮件。
+
+### 使用
+
+```
+# 初始化 pageage.json 文件
+$ npm init
+# 安装依赖
+$ npm install nodemailer --save
+# 运行
+node app.js
+```
+
+```
+app.js
+
+const nodemailer = require('nodemailer');
+
+//开启SMTP连接池
+let transporter = nodemailer.createTransport({
+	host: 'smtp.qq.com',
+	secureConnection: true,  //use SSL
+	port: 465,
+	secure: true,  //secure: true for port 465, secure:false for port 587
+	auth: {
+		user: '987905457@qq.com',
+		pass: 'xxxx'  //qq授权码
+	}
+});
+
+//设置邮件内容（谁发送什么给谁）
+let mailOptions = {
+	from: '"谢丽丹"<987905457@qq.com>',  //发件人
+	to: 'xingxi.xie@gmail.com',   //收件人
+	subject: 'Hello',  //主题
+	text: '这是一封来自nodejs的测试邮件',  //文本内容
+	html: '<b>这是一封来自nodejs的测试邮件</b>',  //html body
+	//下面是发送附件，不需要就注释掉
+	attachments: [{
+		filename: 'test.txt',
+		path: './test.txt',
+	},
+	{
+		filename: 'content',
+		content: '发送内容'
+	}]
+};
+
+//使用先前创建的传输器的sendMail方法传递消息对象
+transporter.sendMail(mailOptions, (error, info) => {
+	if(error) {
+		return console.log(error);
+	}
+	console.log('message: ${info.messageId}');
+	console.log('sent: ${info.response}');
+});
+
+```
+
+由于我是使用qq邮箱来发送邮件的，qq邮箱需要获取POP3/SMTP服务授权码。
+![qq邮箱授权](http://img.blog.csdn.net/20170815230226516?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+### 结果
+![收到邮件](http://img.blog.csdn.net/20170815230608935?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlleGluZ3hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
