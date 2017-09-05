@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>截图demo</title>
+	<style type="text/css">
+		#ViewDiv
+		{
+		width: 200px;
+		height: 200px;
+		}
+		#bgDiv
+		{
+		width: 500px;
+		height: 600px;
+		position: relative;
+		}
+		#dragDiv
+		{
+		width: 100px;
+		height: 80px;
+		left: 50px;
+		top: 50px;
+		border: solid 1px #fff;
+		cursor: move;
+		}
+		#dRightDown, #dLeftDown, #dLeftUp, #dRightUp, #dRight, #dLeft, #dUp, #dDown
+		{
+		position: absolute;
+		background: #FFF;
+		border: 1px solid #333;
+		width: 6px;
+		height: 6px;
+		z-index: 500;
+		font-size: 0;
+		opacity: 0.5;
+		filter: alpha(opacity=50);
+		}
+		#dLeftDown, #dRightUp
+		{
+		cursor: ne-resize;
+		}
+		#dRightDown, #dLeftUp
+		{
+		cursor: nw-resize;
+		}
+		#dRight, #dLeft
+		{
+		cursor: e-resize;
+		}
+		#dUp, #dDown
+		{
+		cursor: n-resize;
+		}
+		#dLeftDown
+		{
+		left: 0px;
+		bottom: 0px;
+		}
+		#dRightUp
+		{
+		right: 0px;
+		top: 0px;
+		}
+		#dRightDown
+		{
+		right: 0px;
+		bottom: 0px;
+		background-color: #00F;
+		}
+		#dLeftUp
+		{
+		left: 0px;
+		top: 0px;
+		}
+		#dRight
+		{
+		right: 0px;
+		top: 50%;
+		margin-top: -4px;
+		}
+		#dLeft
+		{
+		left: 0px;
+		top: 50%;
+		margin-top: -4px;
+		}
+		#dUp
+		{
+		top: 0px;
+		left: 50%;
+		margin-left: -4px;
+		}
+		#dDown
+		{
+		bottom: 0px;
+		left: 50%;
+		margin-left: -4px;
+		}
+		</style>
+</head>
+<body>
+	<div id="bgDiv">
+		<div id="dragDiv">
+			<div id="dRightDown"></div>
+			<div id="dLeftDown"></div>
+			<div id="dRightUp"></div>
+			<div id="dLeftUp"></div>
+			<div id="dRight"></div>
+			<div id="dLeft"></div>
+			<div id="dDown"></div>
+			<div id="dUp"></div>
+		</div>
+	</div>
+	<div id="ViewDiv"></div>
+	<br />
+	<br />
+	<input type="button" value="生成图片" onclick="create();" /><br />
+	<br />
+	<img id="ShowImg" alt="" src="" style="display: none;" />
+	<script language="javascript" type="text/javascript" src="js/prototype.js"></script>
+	<script language="javascript" type="text/javascript" src="js/ImgCropper.js"></script>
+	<script language="javascript" type="text/javascript" src="js/Drag.js"></script>
+	<script language="javascript" type="text/javascript" src="js/Resize.js"></script>
+	<script language="javascript" type="text/javascript">
+		var isIE = (document.all) ? true : false; // 是否ie
+		var isIE6 = isIE && ([/MSIE (\d)\.0/i.exec(navigator.userAgent)][0][1] == 6);
+		var $ = function(id) {
+		//返回id对象
+		return "string" == typeof id ? document.getElementById(id) : id;
+		};
+		var imgCropper = new ImgCropper("bgDiv", "dragDiv", "image/Hydrangeas.jpg", {
+		Width: 500,
+		Height: 600, 
+		Color: "#FFF",
+		Resize: true,
+		Right: "dRight",
+		Left: "dLeft",
+		Up: "dUp",
+		Down: "dDown",
+		RightDown: "dRightDown",
+		LeftDown: "dLeftDown",
+		RightUp: "dRightUp",
+		LeftUp: "dLeftUp",
+		Preview: "ViewDiv"
+		// viewWidth: 200, //这里要是不写的话预览截图就等同大
+		// viewHeight: 200
+		})
+		function create() {
+		var path = imgCropper.Url;
+		var o = imgCropper.GetPos();
+		x = o.Left;
+		y = o.Top;
+		w = o.Width;
+		h = o.Height;
+		pw = imgCropper._layBase.width;
+		ph = imgCropper._layBase.height;
+		$("ShowImg").onload = function() { this.style.display = ""; }
+		$("ShowImg").src = "ImageCropper.ashx?p=" + path + "&x=" + x + "&y=" + y + "&w=" + w + "&h=" + h + "&pw=" + pw + "&ph=" + ph + "&" + Math.random();
+		}
+	</script>
+</body>
+</html>
